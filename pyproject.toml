@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "icp-prospector"
+version = "0.1.0"
+description = "CLI tool for ICP lead discovery from public sources"
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [{ name = "ICP Prospector" }]
+dependencies = [
+  "requests>=2.32.0",
+  "PyYAML>=6.0.1",
+  "rich>=13.7.0",
+  "python-dotenv>=1.0.1",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0.0"]
+
+[project.scripts]
+prospector = "prospector.cli:main"
+
+[tool.setuptools]
+packages = ["prospector", "prospector.sources", "prospector.outputs"]

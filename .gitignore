@@ -205,3 +205,12 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# ICP Prospector local/runtime files
+config/icp.yaml
+state/
+output/
+.env
+__pycache__/
+!state/.gitkeep
+!output/.gitkeep

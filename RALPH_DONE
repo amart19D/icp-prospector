@@ -1,0 +1,1 @@
+ICP Prospector v1 complete — CLI pipeline implemented with source adapters, enrichment/scoring/dedup, CSV+Sheets outputs, markdown reporting, export command, tests, and CI.

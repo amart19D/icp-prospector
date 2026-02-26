@@ -1,0 +1,55 @@
+icp:
+  name: "Bootstrapped SaaS Support Pain"
+  pain_keywords:
+    - "support is killing me"
+    - "same questions over and over"
+    - "help docs are a mess"
+    - "intercom too expensive"
+    - "drowning in support tickets"
+  keyword_expansions:
+    "support is killing me":
+      - "support tickets overwhelming"
+      - "drowning in support"
+  exclude_keywords:
+    - "enterprise"
+    - "B2C"
+    - "hiring manager"
+  scoring:
+    pain_signal_present: 30
+    b2b_saas_signals: 25
+    small_team_signals: 20
+    helpdesk_stack_detected: 15
+    docs_present: 10
+
+sources:
+  x: true
+  x_requests_per_minute: 20
+  reddit:
+    subreddits: [SaaS, microsaas, startups, indiehackers]
+    requests_per_minute: 30
+  indie_hackers: true
+  indie_hackers_requests_per_minute: 20
+  product_hunt: true
+  product_hunt_requests_per_minute: 20
+  hacker_news: true
+  hacker_news_requests_per_minute: 40
+
+output:
+  google_sheets:
+    enabled: false
+    sheet_id: ""
+    tab_name: "Prospects"
+    account: ""
+  csv:
+    enabled: true
+    path: "output/leads.csv"
+  summary:
+    enabled: true
+    mode: "stdout"
+    discord_webhook: ""
+
+state:
+  seen_domains_file: "state/seen_domains.json"
+
+http:
+  timeout_seconds: 10
