@@ -35,5 +35,6 @@ def test_enricher_detects_stack(monkeypatch) -> None:
     enricher.enrich(lead)
 
     assert lead.support_stack == "intercom"
-    assert lead.docs_url.endswith("/docs")
+    # docs_url check removed — _find_docs_url was dropped (4 HEAD reqs per lead, too expensive)
+    assert lead.docs_url == ""
     assert lead.b2b_signal_count >= 3
