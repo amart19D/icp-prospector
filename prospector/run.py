@@ -104,6 +104,8 @@ def run_pipeline(
 ) -> dict:
     config = load_config(config_path)
     request_manager = RequestManager(timeout_seconds=int(config.get("http", {}).get("timeout_seconds", 10)))
+    # Enrichment uses a fast, low-retry manager — enrichment is best-effort, not critical
+    enrich_request_manager = RequestManager(timeout_seconds=3, max_retries=1, backoff_seconds=(1, 2, 4))
     throttle_multiplier = 2.0 if throttle else 1.0
     sources = build_sources(config, request_manager, throttle_multiplier)
 
@@ -116,7 +118,7 @@ def run_pipeline(
 
     all_keywords, reverse_keyword_map = _expand_keywords(config)
     scorer = Scorer(config["icp"]["scoring"])
-    enricher = Enricher(request_manager)
+    enricher = Enricher(enrich_request_manager)
     seen = load_seen_domains(config["state"]["seen_domains_file"])
     deduper = Deduplicator(seen)
 
@@ -143,12 +145,14 @@ def run_pipeline(
                 lead.discard_reason = "excluded_keyword"
                 progress.advance(enrich_task)
                 continue
-            enricher.enrich(lead)
+            # Only enrich leads that have a domain — enrichment without a domain is a no-op anyway
+            if lead.domain:
+                enricher.enrich(lead)
             scorer.score(lead)
             progress.advance(enrich_task)
 
-    scored = [lead for lead in raw_leads if lead.fit_score >= 40 and not lead.discard_reason]
-    low_fit = [lead for lead in raw_leads if lead.fit_score < 40 and not lead.discard_reason]
+    scored = [lead for lead in raw_leads if lead.fit_score >= 25 and not lead.discard_reason]
+    low_fit = [lead for lead in raw_leads if lead.fit_score < 25 and not lead.discard_reason]
     for lead in low_fit:
         lead.discard_reason = "low_score"
 

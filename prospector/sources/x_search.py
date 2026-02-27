@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import json
 import subprocess
-import re
+import tempfile
+import os
 
 from prospector.models import Lead
 from prospector.sources.base import Source
@@ -21,32 +22,34 @@ class XSearchSource(Source):
 
         for keyword in keywords:
             self._wait_for_slot()
-            cmd = [
-                "python3",
-                X_SCRIPT_PATH,
-                "--query",
-                keyword,
-                "--max",
-                "20",
-                "--no-retweets",
-            ]
+            with tempfile.NamedTemporaryFile(suffix=".json", delete=False) as tf:
+                out_path = tf.name
             try:
-                proc = subprocess.run(cmd, check=True, capture_output=True, text=True)
+                cmd = [
+                    "python3",
+                    X_SCRIPT_PATH,
+                    "--query",
+                    keyword,
+                    "--max",
+                    "20",
+                    "--no-retweets",
+                    "--out",
+                    out_path,
+                ]
+                subprocess.run(cmd, check=True, capture_output=True, text=True)
+                with open(out_path) as f:
+                    payload = json.load(f)
             except (subprocess.CalledProcessError, FileNotFoundError) as exc:
                 self.logger.warning("X script failed for keyword '%s': %s", keyword, exc)
                 continue
-
-            raw = proc.stdout.strip()
-            match = re.search(r"(\{.*\}|\[.*\])", raw, re.DOTALL)
-            if match:
-                raw = match.group(1)
-            try:
-                payload = json.loads(raw)
-            except json.JSONDecodeError:
-                self.logger.warning("X script returned invalid JSON for keyword '%s'", keyword)
+            except (json.JSONDecodeError, OSError) as exc:
+                self.logger.warning("X script output parse failed for keyword '%s': %s", keyword, exc)
                 continue
+            finally:
+                if os.path.exists(out_path):
+                    os.unlink(out_path)
 
-            items = payload if isinstance(payload, list) else payload.get("results", [])
+            items = payload if isinstance(payload, list) else payload.get("results", payload.get("tweets", []))
             for item in items:
                 url = item.get("url") or item.get("tweet_url") or ""
                 if not url or url in seen_urls:

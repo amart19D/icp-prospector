@@ -11,7 +11,7 @@ def append_to_sheets(
     tab_name: str,
     leads: list[Lead],
     account: str | None = None,
-    gog_bin: str = "/usr/bin/gog",
+    gog_bin: str = "/usr/local/bin/gog",
 ) -> None:
     if not sheet_id or not leads:
         return

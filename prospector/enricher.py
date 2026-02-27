@@ -31,7 +31,8 @@ class Enricher:
         lead.support_stack = self._detect_support_stack(lower_html)
         lead.b2b_signal_count = self._count_signals(lower_html, B2B_TERMS)
         lead.small_team_signal_count = self._count_signals(lower_html, SMALL_TEAM_TERMS)
-        lead.docs_url = self._find_docs_url(home_url)
+        # NOTE: docs URL check removed — 4 HEAD requests per lead is too expensive
+        # lead.docs_url = self._find_docs_url(home_url)
 
         details_text = self._scrape_details_pages(home_url)
         if details_text:
