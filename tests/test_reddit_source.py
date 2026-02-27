@@ -7,21 +7,18 @@ class FakeRequestManager(RequestManager):
         super().__init__(timeout_seconds=10)
 
     def get_json(self, url, params=None, headers=None):
+        # pullpush.io format: {"data": [{flat post object}, ...]}
         return {
-            "data": {
-                "children": [
-                    {
-                        "data": {
-                            "id": "abc123",
-                            "permalink": "/r/SaaS/comments/abc123/help_docs_are_a_mess/",
-                            "title": "Help docs are a mess",
-                            "selftext": "our support is killing me at acme.com",
-                            "author": "founder1",
-                            "url": "https://acme.com",
-                        }
-                    }
-                ]
-            }
+            "data": [
+                {
+                    "id": "abc123",
+                    "permalink": "/r/SaaS/comments/abc123/help_docs_are_a_mess/",
+                    "title": "Help docs are a mess",
+                    "selftext": "our support is killing me at acme.com",
+                    "author": "founder1",
+                    "url": "https://acme.com",
+                }
+            ]
         }
 
 
