@@ -19,15 +19,15 @@ class RedditSource(Source):
         for subreddit in subreddits:
             for keyword in keywords:
                 self._wait_for_slot()
-                url = f"https://www.reddit.com/r/{subreddit}/search.json?q={quote_plus(keyword)}&sort=new&limit=25&restrict_sr=1"
+                # Use pullpush.io (Pushshift alternative) — Reddit's own API blocks VPS IPs
+                url = f"https://api.pullpush.io/reddit/search/submission/?subreddit={subreddit}&q={quote_plus(keyword)}&size=25&sort=desc"
                 try:
-                    payload = self.request_manager.get_json(url, headers={"User-Agent": "icp-prospector/0.1"})
+                    payload = self.request_manager.get_json(url)
                 except RuntimeError as exc:
                     self.logger.warning("Reddit request failed for r/%s: %s", subreddit, exc)
                     continue
 
-                for child in payload.get("data", {}).get("children", []):
-                    data = child.get("data", {})
+                for data in payload.get("data", []):
                     permalink = data.get("permalink", "")
                     if not permalink:
                         continue
