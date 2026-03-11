@@ -214,3 +214,9 @@ output/
 __pycache__/
 !state/.gitkeep
 !output/.gitkeep
+
+# Ralph loop internal files — never commit
+RALPH_PROMPT.md
+RALPH_DONE
+RALPH_BLOCKED
+.ralph-loop.log

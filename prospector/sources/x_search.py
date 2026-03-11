@@ -9,7 +9,7 @@ from prospector.models import Lead
 from prospector.sources.base import Source
 from prospector.utils import domain_from_url, extract_domain, short_snippet
 
-X_SCRIPT_PATH = "~/.openclaw/workspace/skills/x-search/scripts/x_search_smart.py"
+X_SCRIPT_PATH = os.environ.get("ICP_X_SCRIPT_PATH", "x_search_smart.py")
 
 
 class XSearchSource(Source):
